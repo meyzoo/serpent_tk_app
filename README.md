@@ -125,3 +125,17 @@ v1:serpent-ctr:<nonce_base64>:<ciphertext_base64>
   * `output = input XOR keystream`
 
 ---
+## 8. Работа с файлами
+
+GUI поддерживает загрузку/сохранение **в UTF-8**:
+
+* Ключ: `key_hex.txt`
+* Открытый текст: `plaintext.txt`
+* Контейнер шифртекста: `cipher_container.txt`
+
+Ограничение на размер по умолчанию:
+
+* текст: до **1 MB**
+* контейнер/сохранение: до **2 MB** (можно изменить в `app/utils.py`)
+
+---
