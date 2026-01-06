@@ -1,0 +1,286 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL"
+  xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
+  xmlns:dc="http://www.omg.org/spec/DD/20100524/DC"
+  xmlns:di="http://www.omg.org/spec/DD/20100524/DI"
+  id="Definitions_GMSIT_TOBE"
+  targetNamespace="http://gms-it.example/practice/tobe">
+
+  <bpmn:collaboration id="Collaboration_GMSIT_TOBE">
+    <bpmn:participant id="Participant_GMSIT_TOBE"
+      name="ООО «ГМС ИНФОРМАЦИОННЫЕ ТЕХНОЛОГИИ» — Service Desk (TO-BE)"
+      processRef="Process_GMSIT_TOBE"/>
+  </bpmn:collaboration>
+
+  <bpmn:process id="Process_GMSIT_TOBE" isExecutable="false" name="Service Desk TO-BE">
+    <bpmn:laneSet id="LaneSet_GMSIT_TOBE">
+      <bpmn:lane id="Lane_Requester_TOBE" name="Заявитель (сотрудник/пользователь)">
+        <bpmn:flowNodeRef>Start_TOBE</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_Submit_TOBE</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_Receive_TOBE</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>End_TOBE</bpmn:flowNodeRef>
+      </bpmn:lane>
+
+      <bpmn:lane id="Lane_SD_TOBE" name="Service Desk / инженер поддержки">
+        <bpmn:flowNodeRef>Task_Accept_TOBE</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_RequestData_TOBE</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Gateway_Sensitive_TOBE</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_GetKey_TOBE</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_Encrypt_TOBE</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_StoreEnc_TOBE</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_StorePlain_TOBE</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Gateway_Join_TOBE</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_PrepareAnswer_TOBE</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_Send_TOBE</bpmn:flowNodeRef>
+      </bpmn:lane>
+    </bpmn:laneSet>
+
+    <bpmn:startEvent id="Start_TOBE" name="Инцидент/заявка в поддержку">
+      <bpmn:outgoing>Flow_TOBE_1</bpmn:outgoing>
+    </bpmn:startEvent>
+
+    <bpmn:task id="Task_Submit_TOBE" name="Создать заявку (портал/почта/телефон)">
+      <bpmn:incoming>Flow_TOBE_1</bpmn:incoming>
+      <bpmn:outgoing>Flow_TOBE_2</bpmn:outgoing>
+    </bpmn:task>
+
+    <bpmn:task id="Task_Accept_TOBE" name="Принять и зарегистрировать тикет">
+      <bpmn:incoming>Flow_TOBE_2</bpmn:incoming>
+      <bpmn:outgoing>Flow_TOBE_3</bpmn:outgoing>
+    </bpmn:task>
+
+    <bpmn:task id="Task_RequestData_TOBE" name="Запросить/получить данные (логи/скриншоты/конфиги)">
+      <bpmn:incoming>Flow_TOBE_3</bpmn:incoming>
+      <bpmn:outgoing>Flow_TOBE_4</bpmn:outgoing>
+    </bpmn:task>
+
+    <bpmn:exclusiveGateway id="Gateway_Sensitive_TOBE" name="Есть конфиденциальные данные?" default="Flow_TOBE_9">
+      <bpmn:incoming>Flow_TOBE_4</bpmn:incoming>
+      <bpmn:outgoing>Flow_TOBE_5</bpmn:outgoing>
+      <bpmn:outgoing>Flow_TOBE_9</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+
+    <bpmn:task id="Task_GetKey_TOBE" name="Получить/сгенерировать ключ (регламент ИБ)">
+      <bpmn:incoming>Flow_TOBE_5</bpmn:incoming>
+      <bpmn:outgoing>Flow_TOBE_6</bpmn:outgoing>
+    </bpmn:task>
+
+    <bpmn:task id="Task_Encrypt_TOBE" name="Зашифровать вложения Serpent (CTR) → контейнер v1">
+      <bpmn:incoming>Flow_TOBE_6</bpmn:incoming>
+      <bpmn:outgoing>Flow_TOBE_7</bpmn:outgoing>
+    </bpmn:task>
+
+    <bpmn:task id="Task_StoreEnc_TOBE" name="Сохранить контейнер в защищённом хранилище/тикете (ACL)">
+      <bpmn:incoming>Flow_TOBE_7</bpmn:incoming>
+      <bpmn:outgoing>Flow_TOBE_8</bpmn:outgoing>
+    </bpmn:task>
+
+    <bpmn:task id="Task_StorePlain_TOBE" name="Сохранить материалы в тикете/папке (если не конфиденциально)">
+      <bpmn:incoming>Flow_TOBE_9</bpmn:incoming>
+      <bpmn:outgoing>Flow_TOBE_10</bpmn:outgoing>
+    </bpmn:task>
+
+    <bpmn:exclusiveGateway id="Gateway_Join_TOBE" name="Синхронизация">
+      <bpmn:incoming>Flow_TOBE_8</bpmn:incoming>
+      <bpmn:incoming>Flow_TOBE_10</bpmn:incoming>
+      <bpmn:outgoing>Flow_TOBE_11</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+
+    <bpmn:task id="Task_PrepareAnswer_TOBE" name="Подготовить решение/ответ (с учётом ИБ)">
+      <bpmn:incoming>Flow_TOBE_11</bpmn:incoming>
+      <bpmn:outgoing>Flow_TOBE_12</bpmn:outgoing>
+    </bpmn:task>
+
+    <bpmn:task id="Task_Send_TOBE" name="Отправить ответ (портал/почта)">
+      <bpmn:incoming>Flow_TOBE_12</bpmn:incoming>
+      <bpmn:outgoing>Flow_TOBE_13</bpmn:outgoing>
+    </bpmn:task>
+
+    <bpmn:task id="Task_Receive_TOBE" name="Получить ответ и подтвердить закрытие">
+      <bpmn:incoming>Flow_TOBE_13</bpmn:incoming>
+      <bpmn:outgoing>Flow_TOBE_14</bpmn:outgoing>
+    </bpmn:task>
+
+    <bpmn:endEvent id="End_TOBE" name="Тикет закрыт">
+      <bpmn:incoming>Flow_TOBE_14</bpmn:incoming>
+    </bpmn:endEvent>
+
+    <bpmn:sequenceFlow id="Flow_TOBE_1" sourceRef="Start_TOBE" targetRef="Task_Submit_TOBE"/>
+    <bpmn:sequenceFlow id="Flow_TOBE_2" sourceRef="Task_Submit_TOBE" targetRef="Task_Accept_TOBE"/>
+    <bpmn:sequenceFlow id="Flow_TOBE_3" sourceRef="Task_Accept_TOBE" targetRef="Task_RequestData_TOBE"/>
+    <bpmn:sequenceFlow id="Flow_TOBE_4" sourceRef="Task_RequestData_TOBE" targetRef="Gateway_Sensitive_TOBE"/>
+
+    <bpmn:sequenceFlow id="Flow_TOBE_5" sourceRef="Gateway_Sensitive_TOBE" targetRef="Task_GetKey_TOBE">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression"><![CDATA[Да]]></bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+
+    <bpmn:sequenceFlow id="Flow_TOBE_6" sourceRef="Task_GetKey_TOBE" targetRef="Task_Encrypt_TOBE"/>
+    <bpmn:sequenceFlow id="Flow_TOBE_7" sourceRef="Task_Encrypt_TOBE" targetRef="Task_StoreEnc_TOBE"/>
+    <bpmn:sequenceFlow id="Flow_TOBE_8" sourceRef="Task_StoreEnc_TOBE" targetRef="Gateway_Join_TOBE"/>
+
+    <bpmn:sequenceFlow id="Flow_TOBE_9" sourceRef="Gateway_Sensitive_TOBE" targetRef="Task_StorePlain_TOBE"/>
+    <bpmn:sequenceFlow id="Flow_TOBE_10" sourceRef="Task_StorePlain_TOBE" targetRef="Gateway_Join_TOBE"/>
+
+    <bpmn:sequenceFlow id="Flow_TOBE_11" sourceRef="Gateway_Join_TOBE" targetRef="Task_PrepareAnswer_TOBE"/>
+    <bpmn:sequenceFlow id="Flow_TOBE_12" sourceRef="Task_PrepareAnswer_TOBE" targetRef="Task_Send_TOBE"/>
+    <bpmn:sequenceFlow id="Flow_TOBE_13" sourceRef="Task_Send_TOBE" targetRef="Task_Receive_TOBE"/>
+    <bpmn:sequenceFlow id="Flow_TOBE_14" sourceRef="Task_Receive_TOBE" targetRef="End_TOBE"/>
+  </bpmn:process>
+
+  <bpmndi:BPMNDiagram id="BPMNDiagram_GMSIT_TOBE">
+    <bpmndi:BPMNPlane id="BPMNPlane_GMSIT_TOBE" bpmnElement="Collaboration_GMSIT_TOBE">
+
+      <bpmndi:BPMNShape id="Participant_GMSIT_TOBE_di" bpmnElement="Participant_GMSIT_TOBE" isHorizontal="true">
+        <dc:Bounds x="60" y="60" width="2200" height="460"/>
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="Lane_Requester_TOBE_di" bpmnElement="Lane_Requester_TOBE" isHorizontal="true">
+        <dc:Bounds x="90" y="60" width="2170" height="220"/>
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="Lane_SD_TOBE_di" bpmnElement="Lane_SD_TOBE" isHorizontal="true">
+        <dc:Bounds x="90" y="280" width="2170" height="240"/>
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="Start_TOBE_di" bpmnElement="Start_TOBE">
+        <dc:Bounds x="140" y="140" width="36" height="36"/>
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="Task_Submit_TOBE_di" bpmnElement="Task_Submit_TOBE">
+        <dc:Bounds x="220" y="120" width="190" height="80"/>
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="Task_Accept_TOBE_di" bpmnElement="Task_Accept_TOBE">
+        <dc:Bounds x="220" y="340" width="190" height="80"/>
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="Task_RequestData_TOBE_di" bpmnElement="Task_RequestData_TOBE">
+        <dc:Bounds x="460" y="340" width="260" height="80"/>
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="Gateway_Sensitive_TOBE_di" bpmnElement="Gateway_Sensitive_TOBE" isMarkerVisible="true">
+        <dc:Bounds x="770" y="355" width="50" height="50"/>
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="Task_GetKey_TOBE_di" bpmnElement="Task_GetKey_TOBE">
+        <dc:Bounds x="840" y="320" width="190" height="80"/>
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="Task_Encrypt_TOBE_di" bpmnElement="Task_Encrypt_TOBE">
+        <dc:Bounds x="1050" y="320" width="260" height="80"/>
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="Task_StoreEnc_TOBE_di" bpmnElement="Task_StoreEnc_TOBE">
+        <dc:Bounds x="1330" y="320" width="300" height="80"/>
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="Task_StorePlain_TOBE_di" bpmnElement="Task_StorePlain_TOBE">
+        <dc:Bounds x="840" y="420" width="300" height="80"/>
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="Gateway_Join_TOBE_di" bpmnElement="Gateway_Join_TOBE" isMarkerVisible="true">
+        <dc:Bounds x="1680" y="355" width="50" height="50"/>
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="Task_PrepareAnswer_TOBE_di" bpmnElement="Task_PrepareAnswer_TOBE">
+        <dc:Bounds x="1750" y="340" width="260" height="80"/>
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="Task_Send_TOBE_di" bpmnElement="Task_Send_TOBE">
+        <dc:Bounds x="2030" y="340" width="200" height="80"/>
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="Task_Receive_TOBE_di" bpmnElement="Task_Receive_TOBE">
+        <dc:Bounds x="2030" y="120" width="200" height="80"/>
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="End_TOBE_di" bpmnElement="End_TOBE">
+        <dc:Bounds x="2280" y="140" width="36" height="36"/>
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNEdge id="Flow_TOBE_1_di" bpmnElement="Flow_TOBE_1">
+        <di:waypoint x="176" y="158"/>
+        <di:waypoint x="220" y="160"/>
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="Flow_TOBE_2_di" bpmnElement="Flow_TOBE_2">
+        <di:waypoint x="315" y="200"/>
+        <di:waypoint x="315" y="340"/>
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="Flow_TOBE_3_di" bpmnElement="Flow_TOBE_3">
+        <di:waypoint x="410" y="380"/>
+        <di:waypoint x="460" y="380"/>
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="Flow_TOBE_4_di" bpmnElement="Flow_TOBE_4">
+        <di:waypoint x="720" y="380"/>
+        <di:waypoint x="770" y="380"/>
+      </bpmndi:BPMNEdge>
+
+      <!-- YES branch: gateway -> get key -->
+      <bpmndi:BPMNEdge id="Flow_TOBE_5_di" bpmnElement="Flow_TOBE_5">
+        <di:waypoint x="820" y="380"/>
+        <di:waypoint x="830" y="380"/>
+        <di:waypoint x="830" y="360"/>
+        <di:waypoint x="840" y="360"/>
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="Flow_TOBE_6_di" bpmnElement="Flow_TOBE_6">
+        <di:waypoint x="1030" y="360"/>
+        <di:waypoint x="1050" y="360"/>
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="Flow_TOBE_7_di" bpmnElement="Flow_TOBE_7">
+        <di:waypoint x="1310" y="360"/>
+        <di:waypoint x="1330" y="360"/>
+      </bpmndi:BPMNEdge>
+
+      <!-- storeEnc -> join (route via x=1655 to avoid any overlap) -->
+      <bpmndi:BPMNEdge id="Flow_TOBE_8_di" bpmnElement="Flow_TOBE_8">
+        <di:waypoint x="1630" y="360"/>
+        <di:waypoint x="1655" y="360"/>
+        <di:waypoint x="1655" y="380"/>
+        <di:waypoint x="1680" y="380"/>
+      </bpmndi:BPMNEdge>
+
+      <!-- NO branch: gateway -> storePlain -->
+      <bpmndi:BPMNEdge id="Flow_TOBE_9_di" bpmnElement="Flow_TOBE_9">
+        <di:waypoint x="795" y="405"/>
+        <di:waypoint x="795" y="460"/>
+        <di:waypoint x="840" y="460"/>
+      </bpmndi:BPMNEdge>
+
+      <!-- storePlain -> join (vertical at x=1655, справа от верхних блоков) -->
+      <bpmndi:BPMNEdge id="Flow_TOBE_10_di" bpmnElement="Flow_TOBE_10">
+        <di:waypoint x="1140" y="460"/>
+        <di:waypoint x="1655" y="460"/>
+        <di:waypoint x="1655" y="380"/>
+        <di:waypoint x="1680" y="380"/>
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="Flow_TOBE_11_di" bpmnElement="Flow_TOBE_11">
+        <di:waypoint x="1730" y="380"/>
+        <di:waypoint x="1750" y="380"/>
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="Flow_TOBE_12_di" bpmnElement="Flow_TOBE_12">
+        <di:waypoint x="2010" y="380"/>
+        <di:waypoint x="2030" y="380"/>
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="Flow_TOBE_13_di" bpmnElement="Flow_TOBE_13">
+        <di:waypoint x="2130" y="340"/>
+        <di:waypoint x="2130" y="200"/>
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="Flow_TOBE_14_di" bpmnElement="Flow_TOBE_14">
+        <di:waypoint x="2230" y="160"/>
+        <di:waypoint x="2280" y="158"/>
+      </bpmndi:BPMNEdge>
+
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+
+</bpmn:definitions>
