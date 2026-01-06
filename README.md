@@ -27,7 +27,7 @@ serpent_tk_app/
 ├─ requirements.txt
 ├─ main.py
 └─ app/
-├─ **init**.py
+├─ __init__.py
 ├─ gui.py
 ├─ serpent.py
 └─ utils.py
