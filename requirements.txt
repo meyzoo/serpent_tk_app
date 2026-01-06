@@ -1,0 +1,3 @@
+# requirements.txt
+# The application uses only Python standard library modules (tkinter, ttk, base64, secrets, etc.).
+# Python version: 3.9.12
