@@ -109,3 +109,19 @@ v1:serpent-ctr:<nonce_base64>:<ciphertext_base64>
 ```
 
 ---
+## 7. Режим Serpent-CTR (как работает)
+
+* Serpent — блочный шифр 128 бит (16 байт).
+* CTR не требует padding, подходит для произвольной длины текста.
+* Формирование блока счётчика:
+
+  * `counter_block = nonce(8 байт) || counter(8 байт, big-endian)`
+  * `counter` начинается с 0 и увеличивается на 1 для каждого 16-байтного блока.
+* Keystream:
+
+  * `keystream = Serpent.encrypt_block(counter_block)`
+* Шифрование/расшифрование:
+
+  * `output = input XOR keystream`
+
+---
